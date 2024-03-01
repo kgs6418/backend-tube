@@ -5,12 +5,19 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
   "author": "gaurav singh",
   "license": "ISC",
   "devDependencies": {
+    "esm": "^3.2.25",
     "nodemon": "^3.1.0",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "mongoose": "^8.2.0"
   }
 }
