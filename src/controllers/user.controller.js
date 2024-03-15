@@ -3,6 +3,7 @@ import { ApiError } from "../utilis/ApiError.js";
 import { ApiResponse } from "../utilis/ApiResponse.js";
 import { User } from "../model/user.model.js";
 import { uploadCloudinary } from "../utilis/cloudinary.js";
+import jwt from 'jsonwebtoken'
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -66,7 +67,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (
     req.files &&
     Array.isArray(req.files.coverImage) &&
-    req.files.coverImage.coverImage.length > 0
+    req.files.coverImage.length > 0
   ) {
     coverImageLocalPath = req.files.coverImage[0].path;
   }
@@ -179,8 +180,46 @@ await User.findOneAndUpdate(req.user._id,
     .json(new ApiResponse(200,{},"user logged out successfully"))
 })
 
+//refresh token controller.
+const refreshAccessToken=asyncHandler(async(req,res)=>{
+  const incomingRefreshToken=req.cookie.refreshToken || req.body.refreshToken
+  if(!incomingRefreshToken){
+    throw new ApiError(401,"unauthorized request No refresh token")
+  }
+
+ try {
+   const decodedToken=jwt.verify(incomingRefreshToken,process.env.REFRESH_TOKEN_SECRET)
+ 
+   const user= await User.findById(decodedToken?._id)
+ 
+   if(!user){
+     throw new ApiError(401,"invalid refresh token")
+   }
+ 
+   if (incomingRefreshToken !==user?.refreshToken) {
+     throw new ApiError(401,"refresh token is expired")
+   }
+ 
+   const options={
+     httpOnly:true,
+     secure:true
+   }
+   const {accessToken,newRefreshToken}=await generateAccessAndRefreshToken(user._id)
+ 
+   return res
+   .status(200)
+   .cookie("accessToken",accessToken,options)
+   .cookie("refreshToken",newRefreshToken,options)
+   .json(new ApiResponse(200,{accessToken,refreshToken:newRefreshToken},"access token refreshed successfully"))
+ } catch (error) {
+  throw new ApiError(401,error?.message|| "invalid refresh token")
+ }
+  
+
+})
 
 
 
 
-export { registerUser,loginUser,logoutUser};
+
+export { registerUser,loginUser,logoutUser,refreshAccessToken};
