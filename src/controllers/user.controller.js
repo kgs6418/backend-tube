@@ -97,7 +97,7 @@ const registerUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
   if (!createdUser) {
-    throw new ApiError("500", "something went wrong while registering a user");
+    throw new ApiError(500, "something went wrong while registering a user");
   }
 
   //   response
@@ -343,7 +343,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     );
 });
 
-//aggregation pipeline.
+//getting user channel profile - aggregation pipeline.
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
@@ -357,7 +357,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     {
       $match: {
         username: username,
-      },
+      }
     },
     //lookup pipeline.
     {
