@@ -9,7 +9,7 @@ const likeSchema=new mongoose.Schema({
     likedBy:{type:Schema.Types.ObjectId,ref:"User"},
     tweet:{type:Schema.Types.ObjectId,ref:"Tweet"},
     
-},{timestamps})
+},{timestamps:true})
 
 
 export const Like=mongoose.model("Like",likeSchema)
